@@ -1,6 +1,6 @@
 resource "aws_vpc" "tier-vpc" {
-  cidr_block       = "11.234.0.0/16"
-  instance_tenancy = "default"
+  cidr_block           = "11.234.0.0/16"
+  instance_tenancy     = "default"
   enable_dns_hostnames = true
 
   tags = {
@@ -78,9 +78,9 @@ resource "aws_route_table_association" "app3" {
 }
 
 resource "aws_subnet" "mid-subnet-1" {
-  vpc_id            = aws_vpc.tier-vpc.id
-  cidr_block        = "11.234.4.0/24"
-  availability_zone = "us-east-1a"
+  vpc_id                  = aws_vpc.tier-vpc.id
+  cidr_block              = "11.234.4.0/24"
+  availability_zone       = "us-east-1a"
   map_public_ip_on_launch = "false"
 
   tags = {
@@ -89,9 +89,9 @@ resource "aws_subnet" "mid-subnet-1" {
 }
 
 resource "aws_subnet" "mid-subnet-2" {
-  vpc_id            = aws_vpc.tier-vpc.id
-  cidr_block        = "11.234.5.0/24"
-  availability_zone = "us-east-1b"
+  vpc_id                  = aws_vpc.tier-vpc.id
+  cidr_block              = "11.234.5.0/24"
+  availability_zone       = "us-east-1b"
   map_public_ip_on_launch = "false"
 
   tags = {
@@ -100,9 +100,9 @@ resource "aws_subnet" "mid-subnet-2" {
 }
 
 resource "aws_subnet" "mid-subnet-3" {
-  vpc_id            = aws_vpc.tier-vpc.id
-  cidr_block        = "11.234.6.0/24"
-  availability_zone = "us-east-1c"
+  vpc_id                  = aws_vpc.tier-vpc.id
+  cidr_block              = "11.234.6.0/24"
+  availability_zone       = "us-east-1c"
   map_public_ip_on_launch = "false"
 
   tags = {
@@ -111,9 +111,9 @@ resource "aws_subnet" "mid-subnet-3" {
 }
 
 resource "aws_subnet" "data-subnet-1" {
-  vpc_id            = aws_vpc.tier-vpc.id
-  cidr_block        = "11.234.7.0/24"
-  availability_zone = "us-east-1a"
+  vpc_id                  = aws_vpc.tier-vpc.id
+  cidr_block              = "11.234.7.0/24"
+  availability_zone       = "us-east-1a"
   map_public_ip_on_launch = "false"
 
   tags = {
@@ -122,9 +122,9 @@ resource "aws_subnet" "data-subnet-1" {
 }
 
 resource "aws_subnet" "data-subnet-2" {
-  vpc_id            = aws_vpc.tier-vpc.id
-  cidr_block        = "11.234.8.0/24"
-  availability_zone = "us-east-1b"
+  vpc_id                  = aws_vpc.tier-vpc.id
+  cidr_block              = "11.234.8.0/24"
+  availability_zone       = "us-east-1b"
   map_public_ip_on_launch = "false"
 
   tags = {
@@ -133,12 +133,21 @@ resource "aws_subnet" "data-subnet-2" {
 }
 
 resource "aws_subnet" "data-subnet-3" {
-  vpc_id            = aws_vpc.tier-vpc.id
-  cidr_block        = "11.234.9.0/24"
-  availability_zone = "us-east-1c"
+  vpc_id                  = aws_vpc.tier-vpc.id
+  cidr_block              = "11.234.9.0/24"
+  availability_zone       = "us-east-1c"
   map_public_ip_on_launch = "false"
 
   tags = {
     Name = "data-subnet-3"
+  }
+}
+
+resource "aws_db_subnet_group" "db_subnet_group" {
+  name       = "db_subnet_group"
+  subnet_ids = [aws_subnet.data-subnet-1.id, aws_subnet.data-subnet-2.id, aws_subnet.data-subnet-3.id]
+
+  tags = {
+    Name = "My DB subnet group"
   }
 }
