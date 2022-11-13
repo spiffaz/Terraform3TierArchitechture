@@ -1,9 +1,11 @@
-resource "aws_launch_configuration" "app_as_launch_conf" {
+# launch configuration for app servers (tier 1)
+# if the ips of the servers are needed at launch, the autoscaling groups can be changed to aws_instances and a variable can be set for the count of instances
+resource "aws_launch_configuration" "app_server" {
   name            = "app"
-  image_id        = "ami-026b57f3c383c2eec"
-  instance_type   = "t2.micro"
-  key_name        = "CICD"
-  security_groups = [aws_security_group.app-server-security-group.id]
+  image_id        = var.app_server_image_id
+  instance_type   = var.app_server_instance_type
+  key_name        = var.key_name
+  security_groups = [aws_security_group.app_server.id]
   lifecycle {
     create_before_destroy = true
   }
@@ -18,31 +20,32 @@ resource "aws_launch_configuration" "app_as_launch_conf" {
   EOF
 }
 
-resource "aws_autoscaling_group" "app-asg" {
-  #name = "middleware-asg"
-  name_prefix          = "app-asg"
-  launch_configuration = aws_launch_configuration.app_as_launch_conf.name
-  max_size             = 6
-  min_size             = 3
-  vpc_zone_identifier  = [aws_subnet.app-subnet-1.id, aws_subnet.app-subnet-2.id, aws_subnet.app-subnet-3.id]
+resource "aws_autoscaling_group" "app_server" {
+  name_prefix          = "app-"
+  launch_configuration = aws_launch_configuration.app_server.name
+  max_size             = var.app_server_max_no
+  min_size             = var.app_server_min_no
+  vpc_zone_identifier  = aws_subnet.public.*.id
   target_group_arns    = [aws_lb_target_group.app_lb_tg.arn]
   health_check_type    = "ELB"
   tag {
-    key                 = "role"
-    value               = "app server"
+    key                 = "Name"
+    value               = "${var.default_tags.project}-app-server"
     propagate_at_launch = true
   }
+
+  depends_on = [aws_nat_gateway.nat]
 }
 
-#middleware server
+# middleware server
+resource "aws_launch_configuration" "middleware_server" {
+  name                 = "middleware"
+  image_id             = var.middleware_server_image_id
+  instance_type        = var.middleware_server_instance_type
+  key_name             = var.key_name
+  iam_instance_profile = aws_iam_instance_profile.database_instance_profile.arn
 
-resource "aws_launch_configuration" "mid_as_launch_conf" {
-  name = "middleware"
-  image_id             = "ami-026b57f3c383c2eec"
-  instance_type        = "t2.micro"
-  key_name             = "CICD"
-
-  security_groups = [aws_security_group.mid-server-security-group.id]
+  security_groups = [aws_security_group.middleware_server.id]
   lifecycle {
     create_before_destroy = true
   }
@@ -55,20 +58,23 @@ resource "aws_launch_configuration" "mid_as_launch_conf" {
     sudo systemctl enable httpd
     echo ' <html><body><h1> Check out my page for AWS 3 Tier Architecture </h1></body></html> ' >> /var/www/html/index.html
   EOF
+
 }
 
-resource "aws_autoscaling_group" "mid-asg" {
-  #name = "middleware-asg"
-  name_prefix          = "mid-asg"
-  launch_configuration = aws_launch_configuration.mid_as_launch_conf.name
-  max_size             = 6
-  min_size             = 3
-  vpc_zone_identifier  = [aws_subnet.mid-subnet-1.id, aws_subnet.mid-subnet-2.id, aws_subnet.mid-subnet-3.id]
+resource "aws_autoscaling_group" "middleware_server" {
+  name_prefix          = "mid-"
+  launch_configuration = aws_launch_configuration.middleware_server.name
+  max_size             = var.middleware_server_max_no
+  min_size             = var.middleware_server_min_no
+  vpc_zone_identifier  = aws_subnet.middleware.*.id
   target_group_arns    = [aws_lb_target_group.mid_lb_tg.arn]
   health_check_type    = "ELB"
+
   tag {
-    key                 = "role"
-    value               = "app server"
+    key                 = "Name"
+    value               = "${var.default_tags.project}-middleware-server"
     propagate_at_launch = true
   }
+
+  depends_on = [aws_nat_gateway.nat]
 }
