@@ -133,7 +133,7 @@ resource "aws_route" "private_rt_web_access" {
   route_table_id         = aws_route_table.private_rt[count.index].id
   destination_cidr_block = "0.0.0.0/0"
   nat_gateway_id         = aws_nat_gateway.nat[count.index].id # issue when private subnets are more than public
-  #nat_gateway_id = aws_nat_gateway.nat[(count >= var.public_subnet_count ? 0 : count).index].id 
+  #nat_gateway_id = aws_nat_gateway.nat[(count.index >= var.public_subnet_count ? 0 : count.index).index].id 
 }
 
 # Add middleware subnets to private route table

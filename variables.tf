@@ -40,11 +40,6 @@ variable "database_subnet_count" {
   default     = 3
 }
 
-# maybe delete
-#variable "priv_az_count" {
-# type = number
-#default = var.middleware_subnet_count >= var.database_subnet_count ? var.middleware_subnet_count : var.database_subnet_count
-#}
 
 ###############################################################################
 # Compute
