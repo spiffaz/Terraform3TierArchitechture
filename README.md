@@ -1,58 +1,114 @@
-# 3 Tier architechture in AWS using Terraform
+# 3 Tier Architecture in AWS using Terraform
 
-This creates a 3 tier architecture on AWS using Terraform. 
+![3 Tier Architecture](https://user-images.githubusercontent.com/35563797/201526460-ceaf1b55-63bc-4d57-b9b6-a19a774b39c5.png)
 
-The resources used include : VPC, Subnets, Route Tables, Internet Gateway, NAT Gateway, IAM, AWS Secrets Manager, EC2 instances, Auto Scaling groups, Load balancers, Security groups, S3 and RDS.
+## Overview
 
-The repository can be cloned using this link - ``` https://github.com/spiffaz/Terraform3TierArchitechture.git ```
+This Terraform project creates a scalable and highly available 3-tier architecture on AWS. It includes VPC, Subnets, Route Tables, Internet Gateway, NAT Gateway, IAM, AWS Secrets Manager, EC2 instances, Auto Scaling groups, Load balancers, Security groups, S3, and RDS. The architecture is designed to be resilient, secure, and cost-effective.
 
-![image](https://user-images.githubusercontent.com/35563797/201526460-ceaf1b55-63bc-4d57-b9b6-a19a774b39c5.png)
+You can clone this repository using the following link: [Terraform3TierArchitechture.git](https://github.com/spiffaz/Terraform3TierArchitechture.git)
 
-Features:
+## Features
 
-1)  Use of s3 remote backend to store state file.
-2)  A VPC with 9 subnets (3 public and 6 private) all within 3 availability zones.
-3)  Automatically assigns ipv4 and ipv6 (for public subnets) CIDR blocks to subnets from the specified VPC CIDR block.
-3)  NAT gateways on each public subnet (in each avalilability zone used) for HA.
-4)  Creates and attaches IAM roles to the EC2 instances to ensure the database can be accessed.
-5)  Creation of autoscaling group for each tier to automatically scale when an instance (server) becomes unhealthy.
-6)  Automatic setup of servers when provisioned with the use of user data shell scripts.
-7)  Provisions an RDS database accross all used availability zones.
-8)  Application load balancers in front of the 1st and 2nd tier of the infrastructure to evenly distribute traffic.
-9)  Security groups to restrict traffic from each tier to only the resource ahead of it (ie app load balancer -> app servers -> middleware load balancer -> middleware servers -> database).
-10) Generation of random password to be used by database instance.
-11) Stores generated password in aws secret manager
+- Use of S3 remote backend to store Terraform state files securely.
+- Creation of a VPC with 9 subnets (3 public and 6 private) across 3 availability zones.
+- Automatic assignment of IPv4 and IPv6 (for public subnets) CIDR blocks.
+- High Availability (HA) NAT Gateways in each public subnet.
+- IAM roles attached to EC2 instances for secure database access.
+- Auto Scaling groups for each tier to handle traffic fluctuations.
+- Automatic server provisioning using user data shell scripts.
+- Provisioning of a Multi-AZ RDS database across all used availability zones.
+- Application Load Balancers for traffic distribution.
+- Security groups to restrict traffic between tiers.
+- Generation and storage of random database passwords in AWS Secrets Manager.
 
-Troubleshooting: The number of subnets in each tier should not be greater than the number of public subnets. 
+## Best Practices Followed
 
-Note: NAT gateways might be expensive to light users (billed per hour and by GB of data). An ec2 instance can be provisioned and configured as a NAT server (if you know how to).
+- Infrastructure as Code (IaC) principles using Terraform.
+- Highly available architecture with multi-AZ deployment.
+- Proper tagging for resources.
+- Secure access control using IAM roles and security groups.
+- Use of remote state for Terraform state management.
+- AWS Secrets Manager for sensitive data storage.
+- Resilience against server failures with Auto Scaling.
+- Segregation of resources into public and private subnets.
+- Centralized control with VPC and subnet management.
 
-Prerequisite:
-1)  Install Terraform.
-2)  Setup an AWS account.
-3)  Create an S3 bucket.
-4)  Login to the AWS CLI on the machine you would be using Terraform on.
+## Benefits of 3 Tier Architectures
 
-Steps:
-1)  Save the file in a directory and name appropriately.
-2)  Modify the s3 backend in the ``` main.tf ``` file to your own s3 bucket.
-    ```
-    backend "s3" {
-      bucket = "spiffaz-infrastructure"
-      key    = "terraform/tfstate"
-      region = "us-east-1"
-    }
-    ```
-3)  View and make changes to the default variables in the ``` variables.tf ``` and ``` terraform.tfvars ``` files where necessary.
-4)  Navigate to the directory in your terminal and run ``` terraform init ``` .
-5)  Run the command ``` terraform plan ``` to confirm that there are no errors.
-6)  Run the ``` terraform apply ``` command to apply the configuration.
+- **Scalability**: Easily scale each tier independently based on demand.
+- **High Availability**: Redundancy and load balancing provide fault tolerance.
+- **Security**: Network isolation between tiers enhances security.
+- **Maintainability**: Isolating layers simplifies maintenance and updates.
+- **Cost Optimization**: Efficient resource utilization and scalability reduce costs.
 
-7)  Optional - Run the ``` terraform destroy ``` command to delete the created cloud infrastructure.
+## Areas for Improvement
 
+- Enhance security further with more granular security group rules.
+- Implement continuous integration/continuous deployment (CI/CD) pipelines.
+- Monitor and optimize resource utilization for cost-efficiency.
+- Implement automated backups and disaster recovery for the database.
 
-Connect with me on Linkedin here - ``` https://www.linkedin.com/in/azeta-spiff/ ```
+## Author
 
-Check out my repository showing my expertise in Devops tools here - ``` https://github.com/spiffaz/Devops ```
+Connect with me on LinkedIn: [Azeta Spiff](https://www.linkedin.com/in/azeta-spiff/)
 
-Happy learning!!! (And exploring)
+Check out my DevOps expertise on GitHub: [DevOps Repository](https://github.com/spiffaz/Devops)
+
+## Getting Started
+
+### Prerequisites
+
+1. **AWS Account**: Ensure you have an AWS account with appropriate permissions.
+2. **Terraform Installed**: Install Terraform on your local machine. [Download here](https://www.terraform.io/downloads.html).
+3. **AWS Credentials**: Configure AWS credentials through AWS CLI or environment variables.
+
+### Usage Steps
+
+1. Clone the repository and navigate to the project folder.
+   ```bash
+   git clone https://github.com/spiffaz/Terraform3TierArchitechture.git
+   cd Terraform3TierArchitechture
+   ```
+
+2. Configure AWS credentials:
+   ```bash
+   export AWS_ACCESS_KEY_ID="your-access-key"
+   export AWS_SECRET_ACCESS_KEY="your-secret-key"
+   export AWS_DEFAULT_REGION="us-east-1"  # Set your preferred region
+   ```
+
+3. Initialize Terraform:
+   ```bash
+   terraform init
+   ```
+
+4. Customize Configuration (Optional):
+   Edit `variables.tf` and `terraform.tfvars` to customize configurations (e.g., instance types, tags).
+
+5. Plan the Deployment:
+   ```bash
+   terraform plan
+   ```
+
+6. Apply the Configuration:
+   ```bash
+   terraform apply
+   ```
+
+7. Monitor the Deployment:
+   Terraform will create the infrastructure. Monitor the progress in the terminal.
+
+8. Access Resources:
+   Use the provided output variables, e.g., `app_lb` DNS name and `rds_hostname`, to access your application and database.
+
+9. Destroy Resources (Optional):
+   To tear down the infrastructure, run:
+   ```bash
+   terraform destroy
+   ```
+   Confirm destruction when prompted.
+
+---
+
+By following these steps, you can successfully deploy and manage the 3-tier architecture in your AWS environment using Terraform.
